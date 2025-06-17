@@ -99,7 +99,7 @@ Once you have downloaded the databases, uncompress and set the **UNIX** path's i
 - [Line no. 36](../workflows/conf/centriflaken.config#L36): `serotypefinder_db = /path/to/centriflaken_dbs/serotypefinder`.
 - [Line no. 64](../workflows/conf/centriflaken_hy.config#L64): `serotypefinder_db = /path/to/centriflaken_dbs/serotypefinder`.
 - [Line no. 53](../workflows/conf/centriflaken.config#L53): `abricate_datadir = /path/to/centriflaken_dbs/abricate`.
-- [Line no. 81](../workflows/conf/centriflaken_hy.config#L81): `centrifuge_x = /path/to/centriflaken_dbs/abricate`.
+- [Line no. 81](../workflows/conf/centriflaken_hy.config#L81): `abricate_datadir = /path/to/centriflaken_dbs/abricate`.
 
 \
 &nbsp;
