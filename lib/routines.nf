@@ -6,7 +6,9 @@
 //
 
 import groovy.json.JsonSlurper
-import nextflow.config.ConfigParser
+import groovy.util.ConfigSlurper
+// import nextflow.config.ConfigParser
+// import nextflow.config.ConfigBuilder
 // import groovy.json.JsonOutput
 
 // ASCII logo
@@ -69,8 +71,11 @@ def addPadding(values) {
         s = params.linewidth - (pad + 5)
         if (v.toString().size() > s && !stopnow) {
             def sen = ''
-            v.toString().findAll(/.{1,${s}}\b(?:\W*|\s*)/).each {
-                sen += ' '.multiply(padding + 2) + it + '\n'
+            // v.toString().findAll(/.{1,${s}}\b(?:\W*|\s*)/).each {
+            //     sen += ' '.multiply(padding + 2) + it + '\n'
+            // }
+            v.toString().eachMatch(/.{1,${s}}(?=.*)\b|\w+/) {
+                sen += ' '.multiply(padding + 2) + it.trim() + '\n'
             }
             values[k] = (
                 help ? sen.replaceAll(/^(\n|\s)*/, '') : sen.trim()
@@ -138,9 +143,13 @@ def validateParamsForFASTQ() {
 // before running
 def summaryOfParams() {
 
-    def pipeline_specific_config = new ConfigParser().setIgnoreIncludes(true).parse(
+    // def pipeline_specific_config = pipeline_specific_config = new ConfigParser().setIgnoreIncludes(true).parse(
+    //     file("${params.workflowsconf}${params.fs}${params.pipeline}.config").text
+    // )
+    def pipeline_specific_config = new ConfigSlurper().parse(
         file("${params.workflowsconf}${params.fs}${params.pipeline}.config").text
     )
+
     Map fgcolors = getANSIColors()
     Map globalparams = [:]
     Map localparams = params.subMap(
@@ -258,6 +267,26 @@ def fastqEntryPointHelp() {
     return helptext
 }
 
+// Show concise help text if configured within the main workflow.
+def conciseHelp(def tool = null) {
+    Map fgcolors = getANSIColors()
+
+    tool ?= "fastp"
+    tools = tool?.tokenize(',')
+
+    return """
+${dashedLine()}
+Show configurable CLI options for each tool within ${fgcolors.magenta}${params.pipeline}${fgcolors.reset}
+${dashedLine()}
+Ex: cpipes --pipeline ${params.pipeline} --help
+""" + (tools.size() > 1 ? "Ex: cpipes --pipeline ${params.pipeline} --help ${tools[0]}"
+    + """
+Ex: cpipes --pipeline ${params.pipeline} --help ${tools[0]},${tools[1]}
+${dashedLine()}""".stripIndent() : """Ex: cpipes --pipeline ${params.pipeline} --help ${tool}
+${dashedLine()}""".stripIndent())
+
+}
+
 // Wrap help text with the following options
 def wrapUpHelp() {
 
@@ -310,8 +339,8 @@ ${dashedLine()}
 
     def mail_cmd = [
         'sendmail',
-        '-f', 'cfsan-hpc-noreply@fda.hhs.gov',
-        '-F', 'cfsan-hpc-noreply',
+        '-f', 'noreply@gmail.com',
+        '-F', 'noreply',
         '-t', "${params.user_email}"
     ]
 
